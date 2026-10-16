@@ -1,0 +1,545 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS | Futuristic Maths Game</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --cyan: #00f5ff;
+    --blue: #3867ff;
+    --purple: #bc4dff;
+    --background: #030612;
+    --panel: rgba(8, 18, 43, .88);
+    --muted: #9aadd1;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    color: #f4f8ff;
+    font-family: 'Inter', Arial, sans-serif;
+    background:
+        radial-gradient(ellipse at 10% 15%, #10285e 0%, transparent 38%),
+        radial-gradient(ellipse at 90% 85%, #351052 0%, transparent 38%),
+        var(--background);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(0,245,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,.055) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.orb {
+    position: fixed;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    filter: blur(85px);
+    opacity: .2;
+    pointer-events: none;
+    animation: float 8s ease-in-out infinite alternate;
+}
+
+.orb.one {
+    background: var(--cyan);
+    top: -90px;
+    left: -90px;
+}
+
+.orb.two {
+    background: var(--purple);
+    right: -90px;
+    bottom: -90px;
+    animation-delay: -4s;
+}
+
+.app {
+    width: 100%;
+    max-width: 540px;
+    position: relative;
+    padding: 32px;
+    overflow: hidden;
+    border-radius: 26px;
+    text-align: center;
+    background: var(--panel);
+    border: 1px solid rgba(0,245,255,.3);
+    backdrop-filter: blur(22px);
+    box-shadow:
+        0 0 60px rgba(0,110,255,.14),
+        inset 0 0 35px rgba(40,80,180,.08);
+    animation: enter .7s ease-out;
+}
+
+.app::before {
+    content: "";
+    position: absolute;
+    height: 2px;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    box-shadow: 0 0 18px var(--cyan);
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(130,160,255,.14);
+}
+
+.brand {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: white;
+}
+
+.status {
+    color: #51ffd0;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.status::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: #51ffd0;
+    box-shadow: 0 0 10px #51ffd0;
+}
+
+.logo {
+    width: 82px;
+    height: 82px;
+    margin: 30px auto 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 23px;
+    font-size: 39px;
+    background: linear-gradient(135deg, rgba(0,245,255,.12), rgba(188,77,255,.16));
+    border: 1px solid rgba(0,245,255,.45);
+    box-shadow: 0 0 35px rgba(0,245,255,.12), inset 0 0 20px rgba(0,245,255,.08);
+}
+
+h1 {
+    margin: 16px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(25px, 6vw, 38px);
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(100deg, #ffffff, #00f5ff, #cba1ff);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    filter: drop-shadow(0 0 14px rgba(0,245,255,.2));
+}
+
+h2 {
+    color: #c5f7ff;
+    font-size: 24px;
+    margin: 22px 0;
+}
+
+p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.85;
+}
+
+.tagline {
+    color: #c8d9ff;
+    letter-spacing: 2px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+input {
+    width: 100%;
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid rgba(100,150,255,.38);
+    border-radius: 13px;
+    outline: none;
+    background: rgba(1,7,23,.85);
+    color: white;
+    font: inherit;
+    transition: .25s ease;
+}
+
+input::placeholder {
+    color: #7387af;
+}
+
+input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,.16);
+}
+
+button {
+    width: 100%;
+    max-width: 330px;
+    padding: 16px 20px;
+    margin: 10px auto;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 50px;
+    color: white;
+    background: linear-gradient(100deg, #00cfff, #4054ff 52%, #bd32ff);
+    box-shadow: 0 0 25px rgba(70,100,255,.23);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform .25s, box-shadow .25s, filter .25s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.15);
+    box-shadow: 0 0 28px rgba(0,220,255,.35), 0 0 40px rgba(190,50,255,.18);
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 4px;
+}
+
+#questionNumber {
+    margin-top: 28px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--cyan);
+}
+
+#question {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(28px, 7vw, 42px);
+    color: white;
+    text-shadow: 0 0 24px rgba(0,245,255,.3);
+    margin: 28px 0;
+}
+
+.score-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin: 18px 0;
+    border: 1px solid rgba(0,245,255,.22);
+    border-radius: 14px;
+    background: rgba(0,245,255,.045);
+}
+
+.score-label {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+#score {
+    color: var(--cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 17px;
+}
+
+#feedback {
+    min-height: 28px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.progress-track {
+    width: 100%;
+    height: 5px;
+    overflow: hidden;
+    margin: 18px 0;
+    border-radius: 10px;
+    background: #172342;
+}
+
+#progress {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    box-shadow: 0 0 12px var(--cyan);
+    transition: width .4s ease;
+}
+
+#finalScore {
+    padding: 20px;
+    border: 1px solid rgba(0,245,255,.3);
+    border-radius: 18px;
+    color: var(--cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 29px;
+    background: rgba(0,245,255,.05);
+    text-shadow: 0 0 20px rgba(0,245,255,.3);
+}
+
+.footer {
+    margin-top: 27px;
+    color: #586c98;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+section {
+    animation: enter .4s ease;
+}
+
+@keyframes enter {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    from { transform: translateY(-15px); }
+    to { transform: translateY(25px); }
+}
+
+@media (max-width: 480px) {
+    body { padding: 12px; }
+    .app { padding: 23px 18px; }
+    .brand { font-size: 11px; }
+    p { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="orb one"></div>
+<div class="orb two"></div>
+
+<main class="app">
+    <header class="topbar">
+        <div class="brand">✦ NEXUS / MATHS</div>
+        <div class="status">SYSTEM ONLINE</div>
+    </header>
+
+    <div class="logo">🧠</div>
+    <h1>MATHS GAME</h1>
+    <p class="tagline">Never Give Up · Keep Evolving</p>
+
+    <section id="welcome">
+        <p>Initialize your learning session.<br>Enter your username to begin.</p>
+        <input id="username" type="text" maxlength="30"
+               placeholder="Enter your username..." autocomplete="nickname">
+        <button onclick="startGame()">⚡ &nbsp; START GAME</button>
+    </section>
+
+    <section id="instructions" class="hidden">
+        <h2 id="greeting"></h2>
+        <p>Welcome to the multiplication challenge.<br>
+        Test your times tables knowledge up to 12.</p>
+        <button onclick="showQuestion()">🚀 &nbsp; BEGIN MISSION</button>
+    </section>
+
+    <section id="quiz" class="hidden">
+        <p id="questionNumber"></p>
+        <div class="progress-track"><div id="progress"></div></div>
+        <h2 id="question"></h2>
+
+        <input id="answer" type="number" inputmode="numeric"
+               placeholder="Enter your answer...">
+
+        <button id="submitButton" onclick="checkAnswer()">⚡ &nbsp; SUBMIT ANSWER</button>
+        <p id="feedback" aria-live="polite"></p>
+
+        <div class="score-panel">
+            <span class="score-label">YOUR CURRENT SCORE</span>
+            <span id="score">0 / 3</span>
+        </div>
+
+        <button id="nextButton" class="hidden" onclick="nextQuestion()">
+            NEXT QUESTION →
+        </button>
+    </section>
+
+    <section id="results" class="hidden">
+        <div class="logo">🏆</div>
+        <h2>MISSION COMPLETE</h2>
+        <p>You have completed the multiplication quiz.</p>
+        <h2 id="finalScore"></h2>
+        <p>Keep learning. Keep growing. Never give up.</p>
+        <button onclick="restartGame()">↻ &nbsp; PLAY AGAIN</button>
+    </section>
+
+    <footer class="footer">NEXUS LEARNING SYSTEMS · VERSION 1.0</footer>
+</main>
+
+<script>
+const questions = [
+    { question: "12 × 7 = ?", answer: 84 },
+    { question: "8 × 8 = ?", answer: 64 },
+    { question: "11 × 12 = ?", answer: 132 }
+];
+
+let player = "";
+let score = 0;
+let currentQuestion = 0;
+let answered = false;
+
+function showSection(id) {
+    document.querySelectorAll("main section").forEach(section => {
+        section.classList.add("hidden");
+    });
+    document.getElementById(id).classList.remove("hidden");
+}
+
+function startGame() {
+    const name = document.getElementById("username").value.trim();
+
+    if (!name) {
+        alert("Please enter your username first!");
+        return;
+    }
+
+    player = name;
+    score = 0;
+    currentQuestion = 0;
+    document.getElementById("greeting").textContent = "Welcome, " + player + "!";
+    showSection("instructions");
+}
+
+function showQuestion() {
+    answered = false;
+    showSection("quiz");
+
+    document.getElementById("questionNumber").textContent =
+        "CHALLENGE " + (currentQuestion + 1) + " / " + questions.length;
+
+    document.getElementById("question").textContent =
+        questions[currentQuestion].question;
+
+    document.getElementById("progress").style.width =
+        (currentQuestion / questions.length * 100) + "%";
+
+    document.getElementById("answer").value = "";
+    document.getElementById("answer").disabled = false;
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("score").textContent = score + " / 3";
+
+    document.getElementById("submitButton").classList.remove("hidden");
+    document.getElementById("nextButton").classList.add("hidden");
+    document.getElementById("answer").focus();
+}
+
+function checkAnswer() {
+    if (answered) return;
+
+    const input = document.getElementById("answer");
+    const feedback = document.getElementById("feedback");
+    const value = input.value.trim();
+
+    if (value === "") {
+        feedback.textContent = "Enter an answer to continue.";
+        feedback.style.color = "#ffd166";
+        return;
+    }
+
+    answered = true;
+
+    if (Number(value) === questions[currentQuestion].answer) {
+        score++;
+        feedback.textContent = "✓ CORRECT! Excellent work!";
+        feedback.style.color = "#51ffd0";
+    } else {
+        feedback.textContent =
+            "✕ INCORRECT. Answer: " + questions[currentQuestion].answer;
+        feedback.style.color = "#ff6688";
+    }
+
+    document.getElementById("score").textContent = score + " / 3";
+    document.getElementById("progress").style.width =
+        ((currentQuestion + 1) / questions.length * 100) + "%";
+
+    input.disabled = true;
+    document.getElementById("submitButton").classList.add("hidden");
+
+    const next = document.getElementById("nextButton");
+    next.textContent = currentQuestion === questions.length - 1
+        ? "VIEW FINAL RESULTS →"
+        : "NEXT QUESTION →";
+    next.classList.remove("hidden");
+}
+
+function nextQuestion() {
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    showSection("results");
+    document.getElementById("finalScore").textContent =
+        "YOUR SCORE: " + score + " / " + questions.length;
+}
+
+function restartGame() {
+    document.getElementById("username").value = "";
+    showSection("welcome");
+    document.getElementById("username").focus();
+}
+
+document.getElementById("answer").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        if (answered) nextQuestion();
+        else checkAnswer();
+    }
+});
+
+document.getElementById("username").addEventListener("keydown", event => {
+    if (event.key === "Enter") startGame();
+});
+</script>
+</body>
+</html>
